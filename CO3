@@ -1,0 +1,95 @@
+import java.util.*;
+
+class TransportationNetwork {
+    private int totalCities;
+    private LinkedList<Integer>[] adjacencyList;
+
+    // Initialize the network with a fixed number of cities
+    public TransportationNetwork(int cities) {
+        this.totalCities = cities;
+        adjacencyList = new LinkedList[cities];
+        for (int i = 0; i < cities; i++) {
+            adjacencyList[i] = new LinkedList<>();
+        }
+    }
+
+    // Add a bidirectional travel route between two cities
+    public void addRoute(int source, int destination) {
+        adjacencyList[source].add(destination);
+        adjacencyList[destination].add(source);
+    }
+
+    // 1. BFS to check if a path exists between two locations
+    public void checkConnectivity(int startCity) {
+        boolean[] visited = new boolean[totalCities];
+        Queue<Integer> queue = new LinkedList<>();
+
+        visited[startCity] = true;
+        queue.add(startCity);
+
+        System.out.print("[BFS] Exploring connected cities from City " + startCity + ": ");
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            System.out.print(current + " ");
+
+            for (int neighbor : adjacencyList[current]) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    queue.add(neighbor);
+                }
+            }
+        }
+        System.out.println();
+    }
+
+    // 2. DFS helper to find loops (cycles) in the network
+    private boolean hasLoop(int current, boolean[] visited, int parent) {
+        visited[current] = true;
+
+        for (int neighbor : adjacencyList[current]) {
+            if (!visited[neighbor]) {
+                if (hasLoop(neighbor, visited, current)) return true;
+            } 
+            // If an adjacent city is visited and is not the parent, a loop exists
+            else if (neighbor != parent) {
+                return true; 
+            }
+        }
+        return false;
+    }
+
+    // Main method to check for loops across the whole network
+    public boolean detectNetworkLoops() {
+        boolean[] visited = new boolean[totalCities];
+        for (int i = 0; i < totalCities; i++) {
+            if (!visited[i]) {
+                if (hasLoop(i, visited, -1)) return true;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("=== Transportation Network Analytics (CO3) ===\n");
+
+        // Let's create a network of 4 cities (0: City A, 1: City B, 2: City C, 3: City D)
+        TransportationNetwork network = new TransportationNetwork(4);
+
+        // Laying down travel routes
+        network.addRoute(0, 1); // Route between 0 and 1
+        network.addRoute(1, 2); // Route between 1 and 2
+        network.addRoute(2, 3); // Route between 2 and 3
+
+        // Run BFS exploration
+        network.checkConnectivity(0);
+
+        // Check for loops before closing the network circuit
+        System.out.println("[DFS] Loop detected in network? " + network.detectNetworkLoops());
+
+        System.out.println("\n[UPDATE] Adding a route between City 3 and City 0 to complete a circular path...");
+        network.addRoute(3, 0); 
+
+        // Check for loops again
+        System.out.println("[DFS] Loop detected in network? " + network.detectNetworkLoops());
+    }
+}
