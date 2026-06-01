@@ -1,0 +1,58 @@
+class RouteNode {
+    int routeId;
+    String destination;
+    RouteNode left, right;
+
+    public RouteNode(int routeId, String destination) {
+        this.routeId = routeId;
+        this.destination = destination;
+    }
+}
+
+public class SimpleTravelSystem {
+    private RouteNode root;
+
+    // 1. Easy Insertion (Adds routes based on RouteID)
+    public void addRoute(int routeId, String destination) {
+        root = insert(root, routeId, destination);
+    }
+
+    private RouteNode insert(RouteNode node, int routeId, String destination) {
+        if (node == null) {
+            return new RouteNode(routeId, destination);
+        }
+        if (routeId < node.routeId) {
+            node.left = insert(node.left, routeId, destination);
+        } else if (routeId > node.routeId) {
+            node.right = insert(node.right, routeId, destination);
+        }
+        return node;
+    }
+
+    // 2. Tree Traversal (Prints the schedule beautifully sorted)
+    public void printSortedSchedule() {
+        inorder(root);
+    }
+
+    private void inorder(RouteNode node) {
+        if (node != null) {
+            inorder(node.left); // Visit Left
+            System.out.println("Route ID: " + node.routeId + " -> " + node.destination); // Visit Root
+            inorder(node.right); // Visit Right
+        }
+    }
+
+    // Main method to run the simple test
+    public static void main(String[] args) {
+        SimpleTravelSystem system = new SimpleTravelSystem();
+
+        // Adding routes out of order
+        system.addRoute(30, "London");
+        system.addRoute(10, "New York");
+        system.addRoute(20, "Tokyo");
+
+        // Print sorted result
+        System.out.println("--- Sorted Travel Schedule ---");
+        system.printSortedSchedule();
+    }
+}
