@@ -1,4 +1,4 @@
-class RouteNode {
+public class RouteNode {
     int routeId;
     String destination;
     RouteNode left, right;
@@ -7,17 +7,9 @@ class RouteNode {
         this.routeId = routeId;
         this.destination = destination;
     }
-}
 
-public class SimpleTravelSystem {
-    private RouteNode root;
-
-    // 1. Easy Insertion (Adds routes based on RouteID)
-    public void addRoute(int routeId, String destination) {
-        root = insert(root, routeId, destination);
-    }
-
-    private RouteNode insert(RouteNode node, int routeId, String destination) {
+    // --- Tree Logic inside the same class ---
+    private static RouteNode insert(RouteNode node, int routeId, String destination) {
         if (node == null) {
             return new RouteNode(routeId, destination);
         }
@@ -29,30 +21,25 @@ public class SimpleTravelSystem {
         return node;
     }
 
-    // 2. Tree Traversal (Prints the schedule beautifully sorted)
-    public void printSortedSchedule() {
-        inorder(root);
-    }
-
-    private void inorder(RouteNode node) {
+    private static void inorder(RouteNode node) {
         if (node != null) {
-            inorder(node.left); // Visit Left
-            System.out.println("Route ID: " + node.routeId + " -> " + node.destination); // Visit Root
-            inorder(node.right); // Visit Right
+            inorder(node.left);
+            System.out.println("Route ID: " + node.routeId + " -> " + node.destination);
+            inorder(node.right);
         }
     }
 
-    // Main method to run the simple test
+    // --- The Main Method is now here, so it won't crash! ---
     public static void main(String[] args) {
-        SimpleTravelSystem system = new SimpleTravelSystem();
+        RouteNode root = null;
 
-        // Adding routes out of order
-        system.addRoute(30, "London");
-        system.addRoute(10, "New York");
-        system.addRoute(20, "Tokyo");
+        // Adding routes
+        root = insert(root, 30, "London");
+        root = insert(root, 10, "New York");
+        root = insert(root, 20, "Tokyo");
 
         // Print sorted result
         System.out.println("--- Sorted Travel Schedule ---");
-        system.printSortedSchedule();
+        inorder(root);
     }
 }
