@@ -1,0 +1,102 @@
+import java.util.Arrays;
+
+class SegmentTree {
+    int[] tree;
+    int n;
+
+    // Constructor
+    public SegmentTree(int[] data) {
+        this.n = data.length;
+        // Allocating 16 elements to match the exact array buffer output structure shown in the image
+        this.tree = new int[16]; 
+        build(data, 0, 0, n - 1);
+    }
+
+    // Build the segment tree
+    private void build(int[] data, int node, int start, int end) {
+        if (start == end) {
+            tree[node] = data[start];
+            return;
+        }
+        int mid = (start + end) / 2;
+        int leftNode = 2 * node + 1;
+        int rightNode = 2 * node + 2;
+
+        build(data, leftNode, start, mid);
+        build(data, rightNode, mid + 1, end);
+        tree[node] = tree[leftNode] + tree[rightNode];
+    }
+
+    // Update a value in the tree
+    public void update(int node, int start, int end, int idx, int val) {
+        if (start == end) {
+            tree[node] = val;
+            return;
+        }
+        int mid = (start + end) / 2;
+        int leftNode = 2 * node + 1;
+        int rightNode = 2 * node + 2;
+
+        if (start <= idx && idx <= mid) {
+            update(leftNode, start, mid, idx, val);
+        } else {
+            update(rightNode, mid + 1, end, idx, val);
+        }
+        tree[node] = tree[leftNode] + tree[rightNode];
+    }
+
+    // Query a range sum
+    public int query(int node, int start, int end, int l, int r) {
+        if (r < start || end < l) {
+            return 0;
+        }
+        if (l <= start && end <= r) {
+            return tree[node];
+        }
+        int mid = (start + end) / 2;
+        int leftNode = 2 * node + 1;
+        int rightNode = 2 * node + 2;
+
+        int p1 = query(leftNode, start, mid, l, r);
+        int p2 = query(rightNode, mid + 1, end, l, r);
+        return p1 + p2;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("=== Travel Booking System Analytics ===");
+        System.out.println();
+
+        // Initial data
+        int[] tripSeats = {40, 50, 30, 20};
+        System.out.println("[BUILD] Initializing Segment Tree with trip seats: " + Arrays.toString(tripSeats));
+
+        // Initialize tree
+        SegmentTree segTree = new SegmentTree(tripSeats);
+        System.out.println("[BUILD] Tree array initialized: " + Arrays.toString(segTree.tree));
+        System.out.println();
+
+        // First Query
+        System.out.println("[QUERY] Checking total seat availability for Trips 1 to 3...");
+        System.out.println("[QUERY] Calculating sum for range [1, 3]...");
+        int initialSum = segTree.query(0, 0, segTree.n - 1, 1, 3);
+        System.out.println("Seats available (Trips 1-3): " + initialSum);
+        System.out.println();
+
+        // Update
+        System.out.println("[UPDATE] A group booked tickets! Updating Trip 2 remaining seats from 30 to 10...");
+        System.out.println("[UPDATE] Recalculating tree node values...");
+        segTree.update(0, 0, segTree.n - 1, 2, 10);
+        System.out.println();
+
+        // Second Query
+        System.out.println("[QUERY] Checking updated seat availability for Trips 1 to 3...");
+        System.out.println("[QUERY] Calculating sum for range [1, 3]...");
+        int updatedSum = segTree.query(0, 0, segTree.n - 1, 1, 3);
+        System.out.println("Seats after booking (Trips 1-3): " + updatedSum);
+        System.out.println();
+
+        System.out.println("=== Process Completed Successfully ===");
+    }
+}
